@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "TCE-Connect",
+    "slug": "TCE-Connect",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "scheme": "tceconnect",
+    "userInterfaceStyle": "automatic",
+    "imageWidth": 120,
+    "resizeMode":"contain",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "imageWidth": 120,
+        "backgroundColor": "#ffffff",
+        "resizeMode":"contain"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/logo.png",
+      "imageWidth": 120,
+      "resizeMode":"contain"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/logo.png",
+          "imageWidth": 120,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
