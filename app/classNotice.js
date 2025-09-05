@@ -1,9 +1,17 @@
 // app/classNotice.js
 import { useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { db } from "../config/FirebaseConfig";
 
 export default function ClassNotice() {
@@ -27,17 +35,40 @@ export default function ClassNotice() {
     return () => unsubscribe();
   }, []);
 
+  const handleDelete = async (id) => {
+    Alert.alert(
+      "Delete Notice",
+      "Are you sure you want to delete this notice?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, "classNotices", id));
+              Alert.alert("Success", "Notice deleted successfully.");
+            } catch (error) {
+              Alert.alert("Error", "Failed to delete the notice.");
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#007bff" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Class Notices</Text>
+     
 
       {notices.length === 0 ? (
         <Text style={styles.empty}>No class notices available</Text>
@@ -45,6 +76,7 @@ export default function ClassNotice() {
         <FlatList
           data={notices}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.title}>{item.title}</Text>
@@ -52,12 +84,22 @@ export default function ClassNotice() {
               <Text style={styles.time}>
                 {item.createdAt?.toDate().toLocaleString() || "Just now"}
               </Text>
+
+              {/* Admin-only Delete Button */}
+              {user && user.email === "admin@gmail.com" && (
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => handleDelete(item.id)}
+                >
+                  <Text style={styles.deleteButtonText}>Delete</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         />
       )}
 
-      {/* Admin Add Notice button */}
+      {/* Admin Add Notice Button */}
       {user && user.email === "admin@gmail.com" && (
         <TouchableOpacity
           style={styles.fab}
@@ -71,20 +113,70 @@ export default function ClassNotice() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15 },
-  header: { fontSize: 22, fontWeight: "bold", marginBottom: 15, textAlign: "center" },
-  empty: { textAlign: "center", marginTop: 50, fontSize: 16, color: "gray" },
-  card: {
-    backgroundColor: "#f9f9f9",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-    elevation: 2,
+  container: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+    padding: 15,
   },
-  title: { fontSize: 18, fontWeight: "bold", marginBottom: 5 },
-  desc: { fontSize: 15, color: "#333", marginBottom: 8 },
-  time: { fontSize: 12, color: "gray", textAlign: "right" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#333",
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: 50,
+    fontSize: 16,
+    color: "gray",
+  },
+  listContent: {
+    paddingBottom: 80,
+  },
+  card: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 12,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: "black",
+  },
+  desc: {
+    fontSize: 15,
+    color: "#555",
+    marginBottom: 8,
+  },
+  time: {
+    fontSize: 12,
+    color: "gray",
+    textAlign: "right",
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  deleteButton: {
+    backgroundColor: "#007bff",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  deleteButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   fab: {
     position: "absolute",
     bottom: 20,
@@ -97,5 +189,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 5,
   },
-  fabText: { color: "#fff", fontSize: 28, fontWeight: "bold" },
+  fabText: {
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "bold",
+  },
 });

@@ -1,7 +1,15 @@
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { auth } from "../config/FirebaseConfig";
 
 export default function Signup() {
@@ -34,7 +42,12 @@ export default function Signup() {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require("../assets/logo.png")} // Replace with your background image path
+      style={styles.backgroundImage}
+    >
+      <View style={styles.overlay}>
+        <Text style={styles.title}>Create an Account</Text>
       <TextInput
         placeholder="Email"
         value={email}
@@ -61,15 +74,58 @@ export default function Signup() {
         <Text style={styles.buttonText}>Signup</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push("/login")}>
-        <Text style={{ marginTop: 10, color: "#1e90ff" }}>Already have an account? Login</Text>
+          <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  input: { borderWidth: 1, borderRadius: 5, padding: 10, marginVertical: 5 },
-  button: { backgroundColor: "#1e90ff", padding: 10, borderRadius: 5, marginTop: 10 },
-  buttonText: { color: "#fff", textAlign: "center", fontWeight: "bold" },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: "cover",
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent overlay for better contrast
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#fff", // White text for better contrast
+  },
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 8,
+    backgroundColor: "#fff",
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#1e90ff",
+    padding: 15,
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  linkText: {
+    marginTop: 15,
+    color: "#1e90ff",
+    fontSize: 14,
+    fontWeight: "500",
+  },
 });
